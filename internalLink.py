@@ -31,58 +31,61 @@ bs = BeautifulSoup(html, 'html.parser')
 # ページで見つかった全ての内部リンクのリストを取り出す
 
 
-# includeUrl = urlparse(html).scheme + "://" + urlparse(html).netloc
+# def getIncludeUrl(includeUrl):
+#     includeUrl = urlparse(includeUrl).scheme + urlparse(includeUrl).netloc
+#     return includeUrl
 
 
-def getInternalLinks(bs, includeUrl):
+# def getInternalLinks(bs, includeUrl):
+#     # includeurlをwchemeとnetlocにparseする
+#     includeUrl = urlparse(includeUrl).scheme + urlparse(includeUrl).netloc
+#     internalLinks = []
+#     # Finds all links that begin with a "/"(内部リンク)
+#     for link in bs.findAll('a', href=re.compile('^(/|.*'+includeUrl+')')):
+#         # hrefが存在したら
+#         if link.attrs['href'] is not None:
+#             # 新しい内部リンクだったら
+#             if link.attrs['href'] not in internalLinks:
+#                 # リストに要素を追加
+#                 if(link.attrs['href'].startswith('/')):
+#                     internalLinks.append(includeUrl+link.attrs['href'])
 
-    # includeurlをwchemeとnetlocにparseする
-    includeUrl = urlparse(includeUrl).scheme + ":/" + \
-        urlparse(includeUrl).netloc
-    print(urlparse(includeUrl).scheme)
-    print(urlparse(includeUrl).netloc)
+#     return internalLinks
+
+
+# pprint.pprint(getInternalLinks(bs, html))
+
+
+def getKeywordUrl(bs, includeUrl):
+    includeUrl = urlparse(includeUrl).scheme + urlparse(includeUrl).netloc
+    # keyWord = re.findall("求める人", bs)
     internalLinks = []
-
+    recruitLinks = []
     # Finds all links that begin with a "/"(内部リンク)
     for link in bs.findAll('a', href=re.compile('^(/|.*'+includeUrl+')')):
         # hrefが存在したら
         if link.attrs['href'] is not None:
-            # 新しい内部リンクだったら
+                # 新しい内部リンクだったら
             if link.attrs['href'] not in internalLinks:
-                # リストに要素を追加
                 if(link.attrs['href'].startswith('/')):
+                    # リストに要素を追加
                     internalLinks.append(includeUrl+link.attrs['href'])
-
-    return internalLinks
-
-    keyWord = re.findall("募集要項", bs)
-
-    recruitLinks = []
-
-    # if キーワードが存在したら
-    if len(keyWord > 0):
-        recruitLinks.append(includeUrl+link.attrs['href'])
-
-    return recruitLinks
+                    # キーワードを探す
+                    keyWord = bs.find("a", text=re.compile('求める人'))
+                    # if キーワードが存在したら
+                    if keyWord != -1:
+                        recruitLinks.append(includeUrl+link.attrs['href'])
+                        return recruitLinks
+                    else:
+                        return print("no URL here")
 
 
-pprint.pprint(getInternalLinks(bs, html))
-# getInternalLinks(bs, html)
+pprint.pprint(getKeywordUrl(bs, html))
+# return internalLinks
 
-
-#     # urlをssに追記
+# urlをssに追記
 # wks.update_acell('F3', getInternalLinks)
 
 
-# print(wks.acell('F3').value)
-
-
-# # else:
-# #     internalLinks.append(link.attrs['href'])
-# #     keyWord = re.findall("募集要項", bs)
-# #     # if キーワードが存在したら
-# #     if len(keyWord > 0):
-# #         recruitLinks.append(includeUrl+link.attrs['href'])
-# #         # urlをssに追記
-# #         wks.update_acell('F3', recruitLinks)
-# #         print(wks.acell('F3'))
+# <----------------------タグ内に特定のテキストがあるやつを探す------------->
+# print(BeautifulSoup(html).find_all("a", text=re.compile("新卒採用")))
